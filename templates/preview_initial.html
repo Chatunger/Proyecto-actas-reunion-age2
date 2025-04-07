@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Previa del Acta - AGE2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-container">
+                <img src="/static/img/logo-age2.png" alt="AGE2" class="logo">
+                <!--<h1 class="logo-text">Generador de Actas</h1>-->
+            </div>
+        </header>
+        
+        <main>
+            <h1>Vista Previa del Acta Generada</h1>
+            
+            <div class="acta-preview">
+                <div class="section">
+                    <h2>ACTA DE REUNIÓN</h2>
+                    <p><strong>🏢 Cliente:</strong> {{ acta.cliente }}</p>
+                    <p><strong>📌 Nombre del proyecto:</strong> {{ acta.nombre }}</p>
+                    <p><strong>📅 Fecha de la reunión:</strong> {{ acta.fecha }} {{ acta.hora }}</p>
+                    <p><strong>⏳ Duración:</strong> {{ acta.duracion }}</p>
+                    <p><strong>Autor del acta:</strong> {{ acta.autor }}</p>
+                </div>
+
+                <div class="section">
+                    <h3>👥 Asistentes</h3>
+                    <ul>
+                        {% for asistente in acta.asistentes %}
+                        <li>{{ asistente.nombre }}, {{ asistente.organizacion }} ({{ asistente.estado }})</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>📋 Orden del día</h3>
+                    <ol>
+                        {% for item in acta.orden_dia %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+
+                <div class="section">
+                    <h3>💬 Resumen de los puntos tratados</h3>
+                    <div class="temas-list">
+                        {% for tema in acta.temas %}
+                        <div style="margin-bottom: 15px;">
+                            <h4>Tema: {{ tema.titulo }}</h4>
+                            <p><strong>Puntos clave:</strong></p>
+                            <ul>
+                                {% for punto in tema.puntos %}
+                                <li>{{ punto }}</li>
+                                {% endfor %}
+                            </ul>
+                            <p><strong>Decisiones tomadas:</strong></p>
+                            <ul>
+                                {% for decision in tema.decisiones %}
+                                <li>{{ decision }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>⚠️ Riesgos y problemas detectados</h3>
+                    <div class="riesgos-list">
+                        {% for riesgo in acta.riesgos %}
+                        <div style="margin-bottom: 15px;">
+                            <h4>Riesgo: {{ riesgo.titulo }}</h4>
+                            <p><strong>Problema:</strong> {{ riesgo.problema }}</p>
+                            <p><strong>Riesgos asociados:</strong> {{ riesgo.asociado }}</p>
+                            <p><strong>Mitigaciones propuestas:</strong></p>
+                            <ul>
+                                {% for mitigacion in riesgo.mitigaciones %}
+                                <li>{{ mitigacion }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>💡 Comentarios, Dudas y Preguntas</h3>
+                    <ul>
+                        {% for comentario in acta.comentarios %}
+                        <li>{{ comentario }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>✅ Tareas</h3>
+                    <table class="tareas-table">
+                        <thead>
+                            <tr>
+                                <th>Tareas</th>
+                                <th>Persona/grupo</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tarea in acta.tareas %}
+                            <tr>
+                                <td>{{ tarea.tarea }}</td>
+                                <td>{{ tarea.responsable }}</td>
+                                <td>{{ tarea.fecha }}</td>
+                                <td>{{ tarea.estado }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="section">
+                    <h3>🚀 Próximos pasos</h3>
+                    <ol>
+                        {% for paso in acta.pasos %}
+                        <li>{{ paso }}</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="generar-acta-btn" class="btn btn-primary">
+                        Generar Acta
+                        <span class="spinner"></span>
+                    </button>
+                    <button id="modificar-acta-btn" class="btn btn-secondary">Modificar Acta</button>
+                    <a href="/" class="btn btn-outline">Volver al Inicio</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('generar-acta-btn').addEventListener('click', async () => {
+            const buttonsContainer = document.querySelector('.action-buttons');
+            const button = document.getElementById('generar-acta-btn');
+            button.classList.add('loading');
+            
+            try {
+                const responseData = await fetch('/vista_previa/data');
+                const actaData = await responseData.json();
+                
+                if (!responseData.ok) {
+                    throw new Error("No se pudieron obtener los datos del acta");
+                }
+
+                const response = await fetch('/ejecutar_script', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(actaData)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    buttonsContainer.innerHTML = '';
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = `/download/${data.file_name}`;
+                    downloadLink.textContent = "Descargar Acta";
+                    downloadLink.className = "btn btn-primary";
+                    downloadLink.download = true;
+                    downloadLink.download = data.file_name;
+                    buttonsContainer.appendChild(downloadLink);
+
+                    const successMessage = document.createElement('p');
+                    successMessage.textContent = data.message;
+                    successMessage.className = "success";
+                    successMessage.style.marginTop = '10px';
+                    buttonsContainer.appendChild(successMessage);
+                } else {
+                    throw new Error(data.message || "Error al generar el acta");
+                }
+            } catch (error) {
+                buttonsContainer.innerHTML = `
+                    <p class="error">Error: ${error.message}</p>
+                    <button id="reintentar-btn" class="btn btn-primary">Reintentar</button>
+                    <button id="modificar-acta-btn" class="btn btn-secondary">Modificar Acta</button>
+                    <a href="/" class="btn btn-outline">Volver al Inicio</a>
+                `;
+                document.getElementById('reintentar-btn').addEventListener('click', () => {
+                    document.getElementById('generar-acta-btn').click();
+                });
+                document.getElementById('modificar-acta-btn').addEventListener('click', () => {
+                    window.location.href = '/vista_previa';
+                });
+            } finally {
+                button.classList.remove('loading');
+            }
+        });
+
+        document.getElementById('modificar-acta-btn').addEventListener('click', () => {
+            window.location.href = '/vista_previa';
+        });
+    </script>
+</body>
+</html>

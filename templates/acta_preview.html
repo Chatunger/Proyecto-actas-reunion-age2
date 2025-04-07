@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Acta - AGE2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-container">
+                <img src="/static/img/logo-age2.png" alt="AGE2" class="logo">
+                <!--<h1 class="logo-text">Generador de Actas</h1>-->
+            </div>
+        </header>
+        
+        <main>
+            <h1>Editar Acta de Reunión</h1>
+            
+            <div class="section">
+                <h2>Información Básica</h2>
+                <p><strong>Cliente:</strong> <span class="editable" contenteditable="true" data-field="cliente">{{ acta.cliente }}</span></p>
+                <p><strong>Proyecto:</strong> <span class="editable" contenteditable="true" data-field="nombre">{{ acta.nombre }}</span></p>
+                <p><strong>Fecha:</strong> <span class="editable" contenteditable="true" data-field="fecha">{{ acta.fecha }}</span></p>
+                <p><strong>Hora:</strong> <span class="editable" contenteditable="true" data-field="hora">{{ acta.hora }}</span></p>
+                <p><strong>Duración:</strong> <span class="editable" contenteditable="true" data-field="duracion">{{ acta.duracion }}</span></p>
+                <p><strong>Autor:</strong> <span class="editable" contenteditable="true" data-field="autor">{{ acta.autor }}</span></p>
+            </div>
+
+            <div class="section">
+                <h2>Asistentes</h2>
+                <div id="asistentes-container">
+                    {% for asistente in acta.asistentes %}
+                    <div class="list-item" data-index="{{ loop.index0 }}">
+                        <button class="remove-btn" onclick="removeItem(this, 'asistentes')">×</button>
+                        <p><strong>Nombre:</strong> <span class="editable" contenteditable="true" data-field="nombre">{{ asistente.nombre }}</span></p>
+                        <p><strong>Organización:</strong> <span class="editable" contenteditable="true" data-field="organizacion">{{ asistente.organizacion }}</span></p>
+                        <p><strong>Estado:</strong> <span class="editable" contenteditable="true" data-field="estado">{{ asistente.estado }}</span></p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="add-btn" onclick="addAsistente()">+ Añadir Asistente</button>
+            </div>
+
+            <div class="section">
+                <h2>Orden del Día</h2>
+                <div id="orden_dia-container">
+                    {% for item in acta.orden_dia %}
+                    <div class="list-item" data-index="{{ loop.index0 }}">
+                        <button class="remove-btn" onclick="removeItem(this, 'orden_dia')">×</button>
+                        <span class="editable" contenteditable="true">{{ item }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="add-btn" onclick="addItem('orden_dia')">+ Añadir Punto</button>
+                
+            </div>
+
+            <div class="section">
+                <h2>Temas Tratados</h2>
+                <div id="temas-container">
+                    {% for tema in acta.temas %}
+                    <div class="list-item tema-item" data-index="{{ loop.index0 }}">
+                        <button class="remove-btn" onclick="removeItem(this, 'temas')">×</button>
+                        <p><strong>Título:</strong> <span class="editable" contenteditable="true" data-field="titulo">{{ tema.titulo }}</span></p>
+                        <p><strong>Puntos:</strong></p>
+                        <div id="puntos-container-{{ loop.index0 }}">
+                            {% for punto in tema.puntos %}
+                            <div class="list-item" data-index="{{ loop.index0 }}">
+                                <button class="remove-btn" onclick="removeSubItem(this, 'puntos')">×</button>
+                                <span class="editable" contenteditable="true">{{ punto }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="add-btn" onclick="addSubItem('puntos', this.closest('.tema-item').getAttribute('data-index'))">+ Añadir Punto</button>
+                        <p><strong>Decisiones:</strong></p>
+                        <div id="decisiones-container-{{ loop.index0 }}">
+                            {% for decision in tema.decisiones %}
+                            <div class="list-item" data-index="{{ loop.index0 }}">
+                                <button class="remove-btn" onclick="removeSubItem(this, 'decisiones')">×</button>
+                                <span class="editable" contenteditable="true">{{ decision }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="add-btn" onclick="addSubItem('decisiones', this.closest('.tema-item').getAttribute('data-index'))">+ Añadir Decisión</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="add-btn" onclick="addTema()">+ Añadir Tema</button>
+            </div>
+
+            <div class="section">
+                <h2>Riesgos y Problemas</h2>
+                <div id="riesgos-container">
+                    {% for riesgo in acta.riesgos %}
+                    <div class="list-item riesgo-item" data-index="{{ loop.index0 }}">
+                        <button class="remove-btn" onclick="removeItem(this, 'riesgos')">×</button>
+                        <p><strong>Título:</strong> <span class="editable" contenteditable="true" data-field="titulo">{{ riesgo.titulo }}</span></p>
+                        <p><strong>Problema:</strong> <span class="editable" contenteditable="true" data-field="problema">{{ riesgo.problema }}</span></p>
+                        <p><strong>Asociado:</strong> <span class="editable" contenteditable="true" data-field="asociado">{{ riesgo.asociado }}</span></p>
+                        <p><strong>Mitigaciones:</strong></p>
+                        <div id="mitigaciones-container-{{ loop.index0 }}">
+                            {% for mitigacion in riesgo.mitigaciones %}
+                            <div class="list-item" data-index="{{ loop.index0 }}">
+                                <button class="remove-btn" onclick="removeSubItem(this, 'mitigaciones')">×</button>
+                                <span class="editable" contenteditable="true">{{ mitigacion }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button class="add-btn" onclick="addSubItem('mitigaciones', this.closest('.riesgo-item').getAttribute('data-index'))">+ Añadir Mitigación</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="add-btn" onclick="addRiesgo()">+ Añadir Riesgo</button>
+            </div>
+
+            <div class="section">
+                <h2>Comentarios</h2>
+                <div id="comentarios-container">
+                    {% for comentario in acta.comentarios %}
+                    <div class="list-item" data-index="{{ loop.index0 }}">
+                        <button class="remove-btn" onclick="removeItem(this, 'comentarios')">×</button>
+                        <span class="editable" contenteditable="true">{{ comentario }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="add-btn" onclick="addItem('comentarios')">+ Añadir Comentario</button>
+            </div>
+
+            <div class="section">
+                <h2>Tareas</h2>
+                <div id="tareas-container">
+                    {% for tarea in acta.tareas %}
+                    <div class="list-item" data-index="{{ loop.index0 }}">
+                        <button class="remove-btn" onclick="removeItem(this, 'tareas')">×</button>
+                        <p><strong>Tarea:</strong> <span class="editable" contenteditable="true" data-field="tarea">{{ tarea.tarea }}</span></p>
+                        <p><strong>Responsable:</strong> <span class="editable" contenteditable="true" data-field="responsable">{{ tarea.responsable }}</span></p>
+                        <p><strong>Fecha:</strong> <span class="editable" contenteditable="true" data-field="fecha">{{ tarea.fecha }}</span></p>
+                        <p><strong>Estado:</strong> <span class="editable" contenteditable="true" data-field="estado">{{ tarea.estado }}</span></p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="add-btn" onclick="addTarea()">+ Añadir Tarea</button>
+            </div>
+
+            <div class="section">
+                <h2>Próximos Pasos</h2>
+                <div id="pasos-container">
+                    {% for paso in acta.pasos %}
+                    <div class="list-item" data-index="{{ loop.index0 }}">
+                        <button class="remove-btn" onclick="removeItem(this, 'pasos')">×</button>
+                        <span class="editable" contenteditable="true">{{ paso }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="add-btn" onclick="addItem('pasos')">+ Añadir Paso</button>
+            </div>
+
+            <div class="action-buttons">
+                <button id="guardar-btn" class="btn btn-primary">
+                    Guardar Cambios
+                    <span class="spinner"></span>
+                </button>
+                <button id="generar-acta-btn" class="btn btn-primary">
+                    Generar Acta
+                    <span class="spinner"></span>
+                </button>
+                <a href="/" class="btn btn-outline">Volver al Inicio</a>
+            </div>
+
+            <div id="status-message"></div>
+        </main>
+    </div>
+
+    <script>
+        function getParentIndex(element, className) {
+            let parent = element.closest('.' + className);
+            return parent ? parent.getAttribute('data-index') : null;
+        }
+
+        function removeSubItem(button, subListName) {
+            const item = button.parentElement;
+            const container = item.parentElement;
+            const parentItem = container.closest('.list-item');
+            const parentIndex = parentItem.getAttribute('data-index');
+            
+            container.removeChild(item);
+            
+            Array.from(container.children).forEach((child, index) => {
+                child.setAttribute('data-index', index);
+            });
+        }
+
+        function addSubItem(subListName, parentIndex) {
+            const container = document.getElementById(`${subListName}-container-${parentIndex}`);
+            const index = container.children.length;
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'list-item';
+            newItem.setAttribute('data-index', index);
+            
+            newItem.innerHTML = `
+                <button class="remove-btn" onclick="removeSubItem(this, '${subListName}')">×</button>
+                <span class="editable" contenteditable="true">Nuevo elemento</span>
+            `;
+            
+            container.appendChild(newItem);
+        }
+
+        function addTema() {
+            const container = document.getElementById('temas-container');
+            const index = container.children.length;
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'list-item tema-item';
+            newItem.setAttribute('data-index', index);
+            
+            newItem.innerHTML = `
+                <button class="remove-btn" onclick="removeItem(this, 'temas')">×</button>
+                <p><strong>Título:</strong> <span class="editable" contenteditable="true" data-field="titulo">Nuevo tema</span></p>
+                <p><strong>Puntos:</strong></p>
+                <div id="puntos-container-${index}"></div>
+                <button class="add-btn" onclick="addSubItem('puntos', ${index})">+ Añadir Punto</button>
+                <p><strong>Decisiones:</strong></p>
+                <div id="decisiones-container-${index}"></div>
+                <button class="add-btn" onclick="addSubItem('decisiones', ${index})">+ Añadir Decisión</button>
+            `;
+            
+            container.appendChild(newItem);
+        }
+
+        function addRiesgo() {
+            const container = document.getElementById('riesgos-container');
+            const index = container.children.length;
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'list-item riesgo-item';
+            newItem.setAttribute('data-index', index);
+            
+            newItem.innerHTML = `
+                <button class="remove-btn" onclick="removeItem(this, 'riesgos')">×</button>
+                <p><strong>Título:</strong> <span class="editable" contenteditable="true" data-field="titulo">Nuevo riesgo</span></p>
+                <p><strong>Problema:</strong> <span class="editable" contenteditable="true" data-field="problema">Descripción del problema</span></p>
+                <p><strong>Asociado:</strong> <span class="editable" contenteditable="true" data-field="asociado">Tema asociado</span></p>
+                <p><strong>Mitigaciones:</strong></p>
+                <div id="mitigaciones-container-${index}"></div>
+                <button class="add-btn" onclick="addSubItem('mitigaciones', ${index})">+ Añadir Mitigación</button>
+            `;
+            
+            container.appendChild(newItem);
+        }
+
+        function addAsistente() {
+            const container = document.getElementById('asistentes-container');
+            const index = container.children.length;
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'list-item';
+            newItem.setAttribute('data-index', index);
+            
+            newItem.innerHTML = `
+                <button class="remove-btn" onclick="removeItem(this, 'asistentes')">×</button>
+                <p><strong>Nombre:</strong> <span class="editable" contenteditable="true" data-field="nombre">Nuevo asistente</span></p>
+                <p><strong>Organización:</strong> <span class="editable" contenteditable="true" data-field="organizacion">Organización</span></p>
+                <p><strong>Estado:</strong> <span class="editable" contenteditable="true" data-field="estado">Presente</span></p>
+            `;
+            
+            container.appendChild(newItem);
+        }
+
+        function addTarea() {
+            const container = document.getElementById('tareas-container');
+            const index = container.children.length;
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'list-item';
+            newItem.setAttribute('data-index', index);
+            
+            newItem.innerHTML = `
+                <button class="remove-btn" onclick="removeItem(this, 'tareas')">×</button>
+                <p><strong>Tarea:</strong> <span class="editable" contenteditable="true" data-field="tarea">Nueva tarea</span></p>
+                <p><strong>Responsable:</strong> <span class="editable" contenteditable="true" data-field="responsable">Responsable</span></p>
+                <p><strong>Fecha:</strong> <span class="editable" contenteditable="true" data-field="fecha">Fecha</span></p>
+                <p><strong>Estado:</strong> <span class="editable" contenteditable="true" data-field="estado">Pendiente</span></p>
+            `;
+            
+            container.appendChild(newItem);
+        }
+
+    function addItem(listName) {
+    
+        const container = document.getElementById(`${listName}-container`);
+    
+        if (!container) {
+        console.error(`Contenedor no encontrado: ${listName}-container`);
+        return;
+        }
+
+        const index = container.children.length;
+    
+        const newItem = document.createElement('div');
+        newItem.className = 'list-item';
+        newItem.setAttribute('data-index', index);
+    
+        newItem.innerHTML = `
+        <button class="remove-btn" onclick="removeItem(this, '${listName}')">×</button>
+        <span class="editable" contenteditable="true">Nuevo ${listName.replace('_', ' ')}</span>
+        `;
+    
+    container.appendChild(newItem);
+}
+
+function removeItem(button, listName) {
+    
+    const container = document.getElementById(`${listName}-container`);
+    
+    if (!container) {
+        console.error(`Contenedor no encontrado: ${listName}-container`);
+        return;
+    }
+    
+    const item = button.closest('.list-item');  
+    if (item && container.contains(item)) {
+        container.removeChild(item);
+        
+        
+        Array.from(container.children).forEach((child, index) => {
+            child.setAttribute('data-index', index);
+        });
+    }
+}
+        document.getElementById('guardar-btn').addEventListener('click', async () => {
+            const statusMessage = document.getElementById('status-message');
+            const button = document.getElementById('guardar-btn');
+            statusMessage.textContent = "Guardando cambios...";
+            statusMessage.className = "info";
+            button.classList.add('loading');
+            
+            try {
+                const actaData = collectActaData();
+                
+                const response = await fetch('/guardar_cambios', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(actaData)
+                });
+
+                if (response.ok) {
+                    statusMessage.textContent = "Cambios guardados correctamente";
+                    statusMessage.className = "success";
+                } else {
+                    throw new Error("Error al guardar los cambios");
+                }
+            } catch (error) {
+                statusMessage.textContent = `Error: ${error.message}`;
+                statusMessage.className = "error";
+                console.error("Error:", error);
+            } finally {
+                button.classList.remove('loading');
+            }
+        });
+
+        document.getElementById('generar-acta-btn').addEventListener('click', async () => {
+            const statusMessage = document.getElementById('status-message');
+            const button = document.getElementById('generar-acta-btn');
+            const actionButtons = document.querySelector('.action-buttons');
+    
+            statusMessage.textContent = "Generando acta...";
+            statusMessage.className = "info";
+            button.classList.add('loading');
+    
+    try {
+        const actaData = collectActaData();
+        
+        
+        const saveResponse = await fetch('/guardar_cambios', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(actaData)
+        });
+
+        if (!saveResponse.ok) {
+            throw new Error("Error al guardar los cambios");
+        }
+
+        
+        const response = await fetch('/ejecutar_script', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(actaData)
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            statusMessage.textContent = "Acta generada correctamente";
+            statusMessage.className = "success";
+            
+            
+            const downloadLink = document.createElement('a');
+            downloadLink.href = `/download/${data.file_name}`;
+            downloadLink.textContent = "Descargar Acta";
+            downloadLink.className = "btn btn-primary";
+            downloadLink.style.textDecoration = "none";
+            downloadLink.download = data.file_name;
+            
+            
+            actionButtons.innerHTML = '';
+            actionButtons.appendChild(downloadLink);
+            
+            
+            const editButton = document.createElement('button');
+            editButton.textContent = "Volver a Editar";
+            editButton.className = "btn btn-secondary";
+            editButton.onclick = () => window.location.reload();
+            actionButtons.appendChild(editButton);
+            
+        } else {
+            throw new Error(data.message || "Error al generar el acta");
+        }
+    } catch (error) {
+        statusMessage.textContent = `Error: ${error.message}`;
+        statusMessage.className = "error";
+        console.error("Error:", error);
+    } finally {
+        button.classList.remove('loading');
+    }
+});
+
+        function collectActaData() {
+            return {
+                cliente: document.querySelector('[data-field="cliente"]').textContent,
+                nombre: document.querySelector('[data-field="nombre"]').textContent,
+                fecha: document.querySelector('[data-field="fecha"]').textContent,
+                hora: document.querySelector('[data-field="hora"]').textContent,
+                duracion: document.querySelector('[data-field="duracion"]').textContent,
+                autor: document.querySelector('[data-field="autor"]').textContent,
+                asistentes: collectSectionData('asistentes', ['nombre', 'organizacion', 'estado']),
+                orden_dia: collectSimpleListData('orden_dia'),
+                temas: collectTemasData(),
+                riesgos: collectRiesgosData(),
+                comentarios: collectSimpleListData('comentarios'),
+                tareas: collectSectionData('tareas', ['tarea', 'responsable', 'fecha', 'estado']),
+                pasos: collectSimpleListData('pasos')
+            };
+        }
+
+        function collectSectionData(containerId, fields) {
+            const items = [];
+            document.querySelectorAll(`#${containerId}-container > .list-item`).forEach(item => {
+                const itemData = {};
+                fields.forEach(field => {
+                    itemData[field] = item.querySelector(`[data-field="${field}"]`).textContent;
+                });
+                items.push(itemData);
+            });
+            return items;
+        }
+
+        function collectSimpleListData(containerId) {
+            const items = [];
+            document.querySelectorAll(`#${containerId}-container > .list-item > .editable`).forEach(item => {
+                items.push(item.textContent);
+            });
+            return items;
+        }
+
+        function collectTemasData() {
+            const temas = [];
+            document.querySelectorAll('#temas-container > .list-item').forEach(temaItem => {
+                const temaIndex = temaItem.getAttribute('data-index');
+                const tema = {
+                    titulo: temaItem.querySelector('[data-field="titulo"]').textContent,
+                    puntos: [],
+                    decisiones: []
+                };
+
+                document.querySelectorAll(`#puntos-container-${temaIndex} > .list-item > .editable`).forEach(punto => {
+                    tema.puntos.push(punto.textContent);
+                });
+
+                document.querySelectorAll(`#decisiones-container-${temaIndex} > .list-item > .editable`).forEach(decision => {
+                    tema.decisiones.push(decision.textContent);
+                });
+
+                temas.push(tema);
+            });
+            return temas;
+        }
+
+        function collectRiesgosData() {
+            const riesgos = [];
+            document.querySelectorAll('#riesgos-container > .list-item').forEach(riesgoItem => {
+                const riesgoIndex = riesgoItem.getAttribute('data-index');
+                const riesgo = {
+                    titulo: riesgoItem.querySelector('[data-field="titulo"]').textContent,
+                    problema: riesgoItem.querySelector('[data-field="problema"]').textContent,
+                    asociado: riesgoItem.querySelector('[data-field="asociado"]').textContent,
+                    mitigaciones: []
+                };
+
+                document.querySelectorAll(`#mitigaciones-container-${riesgoIndex} > .list-item > .editable`).forEach(mitigacion => {
+                    riesgo.mitigaciones.push(mitigacion.textContent);
+                });
+
+                riesgos.push(riesgo);
+            });
+            return riesgos;
+        }
+
+        window.addAsistente = addAsistente;
+        window.addTema = addTema;
+        window.addRiesgo = addRiesgo;
+        window.addTarea = addTarea;
+        window.addItem = addItem;
+        window.addSubItem = addSubItem;
+        window.removeItem = removeItem;
+        window.removeSubItem = removeSubItem;
+    </script>
+</body>
+</html>

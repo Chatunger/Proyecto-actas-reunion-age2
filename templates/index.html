@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Actas - AGE2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-container">
+                <img src="/static/img/logo-age2.png" alt="AGE2" class="logo">
+                <!-- <h1 class="logo-text">Generador de Actas</h1> -->
+            </div>
+        </header>
+        
+        <main>
+            <h1>Generador de Actas Automáticas</h1>
+            
+            <div class="form-container">
+                <textarea id="transcript" placeholder="Pega aquí la transcripción de la reunión..."></textarea>
+                <button id="procesar-btn" class="btn btn-primary">
+                    Procesar Transcripción
+                    <span class="spinner"></span>
+                </button>
+            </div>
+            
+            <div id="status-message"></div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('procesar-btn').addEventListener('click', async () => {
+            const transcript = document.getElementById('transcript').value;
+            const statusMessage = document.getElementById('status-message');
+            const button = document.getElementById('procesar-btn');
+            
+            if (!transcript) {
+                statusMessage.textContent = "Por favor, introduce una transcripción";
+                statusMessage.className = "error";
+                return;
+            }
+            
+            statusMessage.textContent = "Procesando transcripción...";
+            statusMessage.className = "info";
+            button.classList.add('loading');
+            
+            try {
+                const response = await fetch('/procesar_transcripcion', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ transcript })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    window.location.href = data.preview_url;
+                } else {
+                    throw new Error(data.error || "Error al procesar la transcripción");
+                }
+            } catch (error) {
+                statusMessage.textContent = `Error: ${error.message}`;
+                statusMessage.className = "error";
+                console.error("Error:", error);
+            } finally {
+                button.classList.remove('loading');
+            }
+        });
+    </script>
+</body>
+</html>
