@@ -10,7 +10,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 
-# Configuración de OAuth 2.0
+
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 def get_gmail_service():
@@ -21,7 +21,7 @@ def get_gmail_service():
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
     
-    # Si no hay credenciales válidas disponibles, el usuario debe iniciar sesión
+    # Credenciales validas-iniciar sesión
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())

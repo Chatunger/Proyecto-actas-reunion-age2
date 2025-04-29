@@ -1,15 +1,39 @@
 {
-    "cliente": "hefame",
-    "fecha": "",
-    "hora": "",
-    "duracion": "",
-    "autor": "",
+    "cliente": "gorfactory",
     "nombre": "",
+    "fecha": "2025-04-29",
+    "hora": "15:37",
+    "duracion": "",
+    "autor": "Francisco Lopez Vigueras",
     "asistentes": [],
     "orden_dia": [],
-    "temas": [],
+    "temas": [
+        {
+            "titulo": "",
+            "puntos": [
+                "Uso de bases de código abierto para desarrollar aplicaciones.",
+                "Adaptación de soluciones existentes para nuevos proyectos."
+            ],
+            "decisiones": [
+                "Se decidió buscar bases de código abierto para evitar comenzar desde cero."
+            ]
+        }
+    ],
     "riesgos": [],
-    "comentarios": [],
-    "tareas": [],
-    "pasos": []
+    "comentarios": [
+        "La dificultad de comenzar proyectos desde cero fue discutida.",
+        "Se mencionó la importancia de tener una base preexistente para facilitar el trabajo."
+    ],
+    "tareas": [
+        {
+            "tarea": "Buscar código abierto relacionado con el baloncesto y adaptarlo.",
+            "responsable": "Francisco Lopez Vigueras",
+            "fecha": "",
+            "estado": "Pendiente"
+        }
+    ],
+    "pasos": [
+        "Buscar y revisar bases de código abierto existentes.",
+        "Evaluar la adaptabilidad del código para el nuevo proyecto."
+    ]
 }

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Actas - AGE2</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
@@ -12,7 +13,6 @@
         <header class="header">
             <div class="logo-container">
                 <img src="/static/img/logo-age2.png" alt="AGE2" class="logo">
-                <!-- <h1 class="logo-text">Generador de Actas</h1> -->
             </div>
         </header>
         
@@ -20,11 +20,81 @@
             <h1>Generador de Actas Automáticas</h1>
             
             <div class="form-container">
-                <textarea id="transcript" placeholder="Pega aquí la transcripción de la reunión..."></textarea>
-                <button id="procesar-btn" class="btn btn-primary">
-                    Procesar Transcripción
-                    <span class="spinner"></span>
-                </button>
+                <div class="tab-container">
+                    <button class="tab-btn active" id="text-tab-btn" onclick="openTab('text-tab')">
+                        <i class="fas fa-align-left"></i> Texto
+                    </button>
+                    <button class="tab-btn" id="audio-tab-btn" onclick="openTab('audio-tab')">
+                        <i class="fas fa-microphone"></i> Audio
+                    </button>
+                </div>
+                
+                <div id="text-tab" class="tab-content active">
+                    <div class="input-group">
+                        <label for="transcript" class="input-label">
+                            <i class="fas fa-paste"></i> Transcripción de la reunión
+                        </label>
+                        <textarea id="transcript" placeholder="Pega aquí el texto de la reunión o la transcripción..."></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button id="procesar-btn" class="btn btn-primary">
+                            <i class="fas fa-cogs"></i> Procesar Transcripción
+                            <span class="spinner"></span>
+                        </button>
+                        <button id="limpiar-btn" class="btn btn-outline">
+                            <i class="fas fa-broom"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="audio-tab" class="tab-content">
+                    <div class="input-group">
+                        <label class="input-label">
+                            <i class="fas fa-file-audio"></i> Subir audio de la reunión
+                        </label>
+                        <div class="upload-container">
+                            <div class="upload-area" id="upload-area">
+                                <input type="file" id="audio-file" accept=".mp3,.wav,.m4a,.ogg" style="display: none;">
+                                <div class="upload-content">
+                                    <div class="upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <h3 class="upload-title">Sube tu archivo de audio</h3>
+                                    <p class="upload-subtitle">Arrastra y suelta tu archivo aquí o haz clic para seleccionar</p>
+                                    <div class="upload-formats">
+                                        <span class="format-tag">MP3</span>
+                                        <span class="format-tag">WAV</span>
+                                        <span class="format-tag">M4A</span>
+                                        <span class="format-tag">OGG</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="audio-preview" class="audio-preview">
+                                <div class="audio-info">
+                                    <i class="fas fa-file-audio audio-icon"></i>
+                                    <div class="audio-details">
+                                        <p id="file-name" class="file-name"></p>
+                                        <p id="file-size" class="file-size"></p>
+                                    </div>
+                                    <button class="remove-audio-btn" id="remove-audio-btn">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="audio-waveform">
+                                    <div class="wave"></div>
+                                    <div class="wave"></div>
+                                    <div class="wave"></div>
+                                    <div class="wave"></div>
+                                    <div class="wave"></div>
+                                </div>
+                                <button id="procesar-audio-btn" class="btn btn-primary">
+                                    <i class="fas fa-cogs"></i> Procesar Audio
+                                    <span class="spinner"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div id="status-message"></div>
@@ -32,19 +102,157 @@
     </div>
 
     <script>
-        document.getElementById('procesar-btn').addEventListener('click', async () => {
-            const transcript = document.getElementById('transcript').value;
-            const statusMessage = document.getElementById('status-message');
-            const button = document.getElementById('procesar-btn');
+        // Variables globales
+        let currentTab = 'text-tab';
+        
+        // Funciones para manejar pestañas
+        function openTab(tabId) {
+            // Ocultar la pestaña actual
+            document.getElementById(currentTab).classList.remove('active');
+            document.getElementById(currentTab + '-btn').classList.remove('active');
             
-            if (!transcript) {
-                statusMessage.textContent = "Por favor, introduce una transcripción";
-                statusMessage.className = "error";
+            // Mostrar la nueva pestaña
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById(tabId + '-btn').classList.add('active');
+            
+            // Actualizar la pestaña actual
+            currentTab = tabId;
+            
+            // Limpiar mensajes de estado
+            document.getElementById('status-message').textContent = '';
+        }
+        
+        // Funciones para el área de texto
+        document.getElementById('limpiar-btn').addEventListener('click', () => {
+            document.getElementById('transcript').value = '';
+            showStatusMessage('Área de texto limpiada', 'success');
+        });
+        
+        // Funciones para el área de audio
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('audio-file');
+        const audioPreview = document.getElementById('audio-preview');
+        const fileName = document.getElementById('file-name');
+        const fileSize = document.getElementById('file-size');
+        const removeAudioBtn = document.getElementById('remove-audio-btn');
+        const procesarAudioBtn = document.getElementById('procesar-audio-btn');
+        
+        // Event listeners para el área de subida
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelection();
+            }
+        });
+        
+        fileInput.addEventListener('change', handleFileSelection);
+        
+        removeAudioBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            resetAudioUpload();
+        });
+        
+        // Función para manejar la selección de archivos
+        function handleFileSelection() {
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                const validExtensions = ['mp3', 'wav', 'm4a', 'ogg'];
+                const extension = file.name.split('.').pop().toLowerCase();
+                
+                if (!validExtensions.includes(extension)) {
+                    showStatusMessage('Error: Tipo de archivo no soportado', 'error');
+                    return;
+                }
+                
+                // Mostrar información del archivo
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                
+                // Mostrar vista previa y ocultar área de subida
+                uploadArea.style.display = 'none';
+                audioPreview.style.display = 'flex';
+                
+                showStatusMessage('Archivo listo para procesar', 'success');
+            }
+        }
+        
+        // Función para resetear la subida de audio
+        function resetAudioUpload() {
+            fileInput.value = '';
+            uploadArea.style.display = 'flex';
+            audioPreview.style.display = 'none';
+            document.getElementById('status-message').textContent = '';
+        }
+        
+        // Función para formatear el tamaño del archivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+        
+        // Función para procesar audio
+        procesarAudioBtn.addEventListener('click', async () => {
+            if (!fileInput.files || !fileInput.files[0]) {
+                showStatusMessage('Por favor, selecciona un archivo de audio', 'error');
                 return;
             }
             
-            statusMessage.textContent = "Procesando transcripción...";
-            statusMessage.className = "info";
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('audio', file);
+            
+            showStatusMessage("Procesando audio, por favor espera...", "info");
+            procesarAudioBtn.classList.add('loading');
+            
+            try {
+                const response = await fetch('/procesar_audio', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    window.location.href = data.preview_url;
+                } else {
+                    throw new Error(data.error || "Error al procesar el audio");
+                }
+            } catch (error) {
+                showStatusMessage(`Error: ${error.message}`, 'error');
+                console.error("Error:", error);
+            } finally {
+                procesarAudioBtn.classList.remove('loading');
+            }
+        });
+        
+        // Función para procesar texto
+        document.getElementById('procesar-btn').addEventListener('click', async () => {
+            const transcript = document.getElementById('transcript').value;
+            const button = document.getElementById('procesar-btn');
+            
+            if (!transcript) {
+                showStatusMessage("Por favor, introduce una transcripción", "error");
+                return;
+            }
+            
+            showStatusMessage("Procesando transcripción...", "info");
             button.classList.add('loading');
             
             try {
@@ -64,13 +272,29 @@
                     throw new Error(data.error || "Error al procesar la transcripción");
                 }
             } catch (error) {
-                statusMessage.textContent = `Error: ${error.message}`;
-                statusMessage.className = "error";
+                showStatusMessage(`Error: ${error.message}`, 'error');
                 console.error("Error:", error);
             } finally {
                 button.classList.remove('loading');
             }
         });
+        
+        // Función para mostrar mensajes de estado
+        function showStatusMessage(message, type) {
+            const statusMessage = document.getElementById('status-message');
+            statusMessage.textContent = message;
+            statusMessage.className = type;
+            
+            // Ocultar mensaje después de 5 segundos (excepto para mensajes de error)
+            if (type !== 'error') {
+                setTimeout(() => {
+                    if (statusMessage.textContent === message) {
+                        statusMessage.textContent = '';
+                        statusMessage.className = '';
+                    }
+                }, 5000);
+            }
+        }
     </script>
 </body>
 </html>
