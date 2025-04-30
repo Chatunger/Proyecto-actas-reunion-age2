@@ -5,10 +5,11 @@ import json
 from openai import OpenAI
 from dotenv import load_dotenv
 from datetime import datetime
-from oauth2 import get_gmail_service, send_email_with_attachment
+#from oauth2 import get_gmail_service, send_email_with_attachment
 import sys
 import re
 import tempfile
+from send_email_smtp import send_email_with_attachment
 
 load_dotenv()
 app = Flask(__name__)
