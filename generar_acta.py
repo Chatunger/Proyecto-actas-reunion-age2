@@ -99,7 +99,7 @@ def get_client_logo(cliente_name):
     """Busca el logo del cliente en la carpeta de logos"""
     base_dir = os.path.dirname(os.path.abspath(__file__))
     logos_dir = os.path.join(base_dir, "static", "img", "logos_clientes")
-    default_logo = os.path.join(logos_dir, "no_cliente.jpg")
+    default_logo = os.path.join(logos_dir, "no_cliente1.jpg")
 
     if not os.path.exists(logos_dir):
         return default_logo
@@ -177,7 +177,7 @@ def main(json_path):
         if os.path.exists(logo_path):
             context['logo'] = InlineImage(doc, logo_path, width=Mm(40))
         else:
-            default_logo = os.path.join(template_dir, "static", "img", "logos_clientes", "no_cliente.jpg")
+            default_logo = os.path.join(template_dir, "static", "img", "logos_clientes", "no_cliente1.jpg")
             context['logo'] = InlineImage(doc, default_logo, width=Mm(40))
 
         doc.render(context)
