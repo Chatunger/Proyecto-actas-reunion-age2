@@ -4,12 +4,17 @@ from docxtpl import DocxTemplate, InlineImage
 from docx.shared import Mm
 import json
 import re
+import traceback
 
 def get_client_logo(cliente_name):
-    """Busca el logo del cliente en la carpeta de logos (sin crear imágenes por defecto)"""
+    """Busca el logo del cliente en la carpeta de logos. Retorna None si no hay cliente o no se encuentra logo"""
+    # Si no hay nombre de cliente válido, retornar None
+    if not cliente_name or not isinstance(cliente_name, str) or cliente_name.strip() == "":
+        return None
+        
+    # Busca el logo del cliente en la carpeta de logos
     base_dir = os.path.dirname(os.path.abspath(__file__))
     logos_dir = os.path.join(base_dir, "static", "img", "logos_clientes")
-    default_logo = os.path.join(logos_dir, "no_cliente.jpg")
 
     # Verificar si existe el directorio de logos
     if not os.path.exists(logos_dir):
@@ -25,8 +30,8 @@ def get_client_logo(cliente_name):
            file_lower.endswith(('.jpg', '.jpeg', '.png')):
             return os.path.join(logos_dir, file)
 
-    # Usar logo por defecto solo si existe
-    return default_logo if os.path.exists(default_logo) else None
+    # No retornar logo por defecto
+    return None
 
 def asegurar_estructura_contexto(context):
     """Garantiza que todos los campos tengan la estructura correcta"""
@@ -98,15 +103,16 @@ def main(json_path):
         doc = DocxTemplate(template_path)
         context = asegurar_estructura_contexto(datos.copy())
 
-        # Manejo seguro del logo
+        # Manejo del logo - solo incluir si existe
         logo_path = get_client_logo(context.get('cliente', ''))
-        context['logo'] = None  # Valor por defecto
-
         if logo_path and os.path.exists(logo_path):
             try:
                 context['logo'] = InlineImage(doc, logo_path, width=Mm(40))
             except Exception as img_error:
                 print(f"Advertencia: Error al cargar logo - {img_error}")
+                context['logo'] = None
+        else:
+            context['logo'] = None  # Asegurarse de que no hay logo
 
         # Renderizar y guardar
         doc.render(context)
@@ -120,6 +126,7 @@ def main(json_path):
         return None
     except Exception as e:
         print(f"Error crítico: {str(e)}", file=sys.stderr)
+        traceback.print_exc()
         return None
 
 if __name__ == "__main__":
@@ -134,3 +141,6 @@ if __name__ == "__main__":
 
     output_path = main(json_path)
     sys.exit(0 if output_path else 1)
+
+
+

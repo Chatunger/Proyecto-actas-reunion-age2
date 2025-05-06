@@ -1,39 +1,63 @@
 {
-    "cliente": "gorfactory",
-    "nombre": "",
-    "fecha": "2025-04-29",
-    "hora": "15:37",
-    "duracion": "",
-    "autor": "Francisco Lopez Vigueras",
-    "asistentes": [],
-    "orden_dia": [],
-    "temas": [
+    "asistentes": [
         {
-            "titulo": "",
-            "puntos": [
-                "Uso de bases de código abierto para desarrollar aplicaciones.",
-                "Adaptación de soluciones existentes para nuevos proyectos."
-            ],
-            "decisiones": [
-                "Se decidió buscar bases de código abierto para evitar comenzar desde cero."
-            ]
+            "estado": "Presente",
+            "nombre": "Abdul",
+            "organizacion": ""
+        },
+        {
+            "estado": "Presente",
+            "nombre": "Raúl",
+            "organizacion": ""
         }
     ],
-    "riesgos": [],
+    "autor": "",
+    "cliente": "Jefe de España",
     "comentarios": [
-        "La dificultad de comenzar proyectos desde cero fue discutida.",
-        "Se mencionó la importancia de tener una base preexistente para facilitar el trabajo."
+        "Abdul reporta que el sistema Jawa no está funcionando para escanear.",
+        "Raúl se encargará de investigar el problema."
+    ],
+    "duracion": "",
+    "fecha": "",
+    "hora": "",
+    "nombre": "Sistema de Tamones",
+    "orden_dia": [
+        "Problemas con el sistema Jawa",
+        "Funcionamiento del Mob",
+        "Problemas de conexión a internet"
+    ],
+    "pasos": [
+        "Raúl contactará a Abdul en 5 minutos para solucionar el problema."
+    ],
+    "riesgos": [
+        {
+            "asociado": "Sistema Jawa",
+            "mitigaciones": [
+                "Verificación de la conexión a internet en el ordenador."
+            ],
+            "problema": "Falta de conexión a internet afecta el funcionamiento del sistema Jawa.",
+            "titulo": "Conexión a Internet"
+        }
     ],
     "tareas": [
         {
-            "tarea": "Buscar código abierto relacionado con el baloncesto y adaptarlo.",
-            "responsable": "Francisco Lopez Vigueras",
+            "estado": "Pendiente",
             "fecha": "",
-            "estado": "Pendiente"
+            "responsable": "Raúl",
+            "tarea": "Contactar a Abdul para resolver el problema del sistema Jawa."
         }
     ],
-    "pasos": [
-        "Buscar y revisar bases de código abierto existentes.",
-        "Evaluar la adaptabilidad del código para el nuevo proyecto."
+    "temas": [
+        {
+            "decisiones": [
+                "Raúl contactará con Abdul para resolver el problema."
+            ],
+            "puntos": [
+                "El sistema Jawa no funciona correctamente para escanear boletas.",
+                "El Mob funciona correctamente pero Jawa no.",
+                "Se sospecha de un problema de conexión a internet."
+            ],
+            "titulo": "Problemas con el sistema Jawa"
+        }
     ]
 }
