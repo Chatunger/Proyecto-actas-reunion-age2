@@ -631,4 +631,20 @@ textarea:focus {
     textarea {
         min-height: 200px;
     }
+
+    .social-icons {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .social-link {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        transition: transform 0.3s, color 0.3s;
+    }
+
+    .social-link:hover {
+        color: var(--primary-hover);
+        transform: scale(1.2);
+    }
 }
