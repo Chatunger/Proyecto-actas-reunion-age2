@@ -5,13 +5,15 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 
-def send_email_with_attachment(filepath, context):
+def send_email_with_attachment(filepath, context, recipient_email=None):
     try:
         # Cargar variables de entorno
         sender_email = os.getenv("SENDER_EMAIL")
-        sender_password = os.getenv("EMAIL_PASSWORD")  # Contraseña de aplicación
-        recipient_email = os.getenv("RECIPIENT_EMAIL", sender_email)
-
+        sender_password = os.getenv("EMAIL_PASSWORD")
+        
+        # Usar el destinatario proporcionado o el de las variables de entorno
+        recipient = recipient_email if recipient_email else os.getenv("RECIPIENT_EMAIL", sender_email)
+        
         # Construir mensaje
         message_text = (
             f"Adjunto el acta de la reunión.\n\n"
@@ -20,12 +22,10 @@ def send_email_with_attachment(filepath, context):
             f"Fecha: {context.get('fecha', 'No especificada')}\n\n"
             f"Tareas principales:\n"
         )
-        for tarea in context.get('tareas', []):
-            message_text += f"- {tarea.get('tarea', '')} (Responsable: {tarea.get('responsable', '')}, Fecha: {tarea.get('fecha', '')})\n"
-
+        
         msg = MIMEMultipart()
         msg['From'] = sender_email
-        msg['To'] = recipient_email
+        msg['To'] = recipient  # Usar el destinatario determinado
         msg['Subject'] = f"Acta de Reunión - {context.get('cliente', '')} - {context.get('fecha', '')}"
         msg.attach(MIMEText(message_text, 'plain'))
 

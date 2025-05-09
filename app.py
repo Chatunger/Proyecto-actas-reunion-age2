@@ -70,8 +70,11 @@ def ejecutar_script():
             # Obtener solo el nombre del archivo (sin la ruta completa)
             filename = os.path.basename(acta_path)
             
+            # Obtener el correo del destinatario si está en los datos
+            recipient_email = datos.get('recipient_email')
+            
             # Enviar el acta por correo
-            if send_email_with_attachment(acta_path, datos):
+            if send_email_with_attachment(acta_path, datos, recipient_email):
                 print("✅ Correo enviado correctamente")
                 return jsonify({
                     "status": "success", 

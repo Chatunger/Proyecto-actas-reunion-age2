@@ -1,48 +1,106 @@
 {
+    "cliente": "Hefame",
+    "fecha": "25-02-2024",
+    "hora": "",
+    "duracion": "3 horas",
+    "autor": "José López",
+    "nombre": "Proyecto X",
     "asistentes": [
         {
-            "estado": "Presente",
-            "nombre": "Abdul",
-            "organizacion": "Jefe de España"
+            "nombre": "Laura Gómez",
+            "organizacion": "Hefame",
+            "estado": "Presente"
         },
         {
-            "estado": "Ausente",
-            "nombre": "Raúl",
-            "organizacion": "Jefe de España"
-        }
-    ],
-    "autor": "",
-    "cliente": "Jefe de España",
-    "comentarios": [],
-    "duracion": "",
-    "fecha": "",
-    "hora": "",
-    "nombre": "",
-    "orden_dia": [],
-    "pasos": [
-        "Raúl llamará a Abdul en 5 minutos"
-    ],
-    "riesgos": [],
-    "tareas": [
+            "nombre": "Ricardo Méndez",
+            "organizacion": "DevSoft",
+            "estado": "Presente"
+        },
         {
-            "estado": "Pendiente",
-            "fecha": "",
-            "responsable": "Raúl",
-            "tarea": "Resolver el problema de conexión de Jawa"
+            "nombre": "Ana Torres",
+            "organizacion": "DevSoft",
+            "estado": "Presente"
+        },
+        {
+            "nombre": "Jorge Ramírez",
+            "organizacion": "Hefame",
+            "estado": "Ausente"
         }
+    ],
+    "orden_dia": [
+        "Revisión del estado actual del proyecto",
+        "Nuevos requerimientos",
+        "Evaluación de riesgos y estrategias de mitigación",
+        "Planificación de los siguientes pasos"
     ],
     "temas": [
         {
-            "decisiones": [
-                "Raúl llamará a Abdul para solucionar el problema"
-            ],
+            "titulo": "Estado del proyecto",
             "puntos": [
-                "Jawa no funciona",
-                "Problemas con el robot",
-                "Mob funciona correctamente"
+                "El proyecto está al 70% de desarrollo",
+                "Pruebas satisfactorias",
+                "Errores menores en la integración con el sistema contable"
             ],
-            "titulo": "Problemas con el sistema de boletas"
+            "decisiones": [
+                "Priorizar la corrección de errores antes de nuevas funcionalidades"
+            ]
+        },
+        {
+            "titulo": "Requerimientos adicionales",
+            "puntos": [
+                "Solicitud de agregar un módulo de reportes personalizados"
+            ],
+            "decisiones": [
+                "Realizar análisis técnico y de costos para la próxima reunión"
+            ]
+        },
+        {
+            "titulo": "Riesgos",
+            "puntos": [
+                "Nuevos requerimientos podrían retrasar el cronograma"
+            ],
+            "decisiones": [
+                "Dividir la implementación en fases como mitigación"
+            ]
         }
     ],
-    "recipient_email": "jose.lopezvigueras@gmail.com"
+    "riesgos": [
+        {
+            "titulo": "Retraso en el cronograma",
+            "problema": "Nuevos requerimientos",
+            "asociado": "Proyecto X",
+            "mitigaciones": [
+                "Dividir la implementación en fases"
+            ]
+        }
+    ],
+    "comentarios": [
+        "El equipo de desarrollo solicitó más detalles sobre los reportes",
+        "Posibilidad de capacitar al equipo del cliente antes de la entrega final"
+    ],
+    "tareas": [
+        {
+            "tarea": "Corrección de errores en la integración",
+            "responsable": "Equipo de DevSoft",
+            "fecha": "05-04-2025",
+            "estado": ""
+        },
+        {
+            "tarea": "Análisis técnico del módulo de reportes",
+            "responsable": "Ricardo Méndez",
+            "fecha": "07-04-2025",
+            "estado": ""
+        },
+        {
+            "tarea": "Programación de una sesión de capacitación",
+            "responsable": "Laura Gómez",
+            "fecha": "10-04-2025",
+            "estado": ""
+        }
+    ],
+    "pasos": [
+        "Presentar el análisis de costos del nuevo módulo en la próxima reunión",
+        "Finalizar la corrección de errores antes del 5 de abril",
+        "Definir una nueva fecha de entrega con los ajustes solicitados"
+    ]
 }
