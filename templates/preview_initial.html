@@ -1,343 +1,538 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+      return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
+    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+        try {
+            var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+            var firstSheetName = workbook.SheetNames[0];
+            var worksheet = workbook.Sheets[firstSheetName];
+
+            
+            var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+            
+            var filteredData = jsonData.filter(row => row.some(filledCell));
+
+            
+            var headerRowIndex = filteredData.findIndex((row, index) =>
+              row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+            );
+            
+            if (headerRowIndex === -1 || headerRowIndex > 25) {
+              headerRowIndex = 0;
+            }
+
+            
+            var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); 
+            csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+            return csv;
+        } catch (e) {
+            console.error(e);
+            return "";
+        }
+    }
+    return gk_fileData[filename] || "";
+    }
+    </script><!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vista Previa del Acta - AGE2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css">
-    <style>
-        .acta-continua {
-            background-color: var(--card-color);
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            line-height: 1.6;
-            border: 1px solid var(--border-color);
-            position: relative;
-        }
-        .titulo-contenedor {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 1.5rem 0;
-            position: relative;
-        }
-        .acta-continua h2 {
-            color: var(--primary-color);
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 0;
-            text-align: center;
-        }
-        .logo-titulo {
-            position: absolute;
-            left: 0;
-            height: 40px;
-            width: auto;
-        }
-        .acta-continua h3 {
-            color: var(--accent-color);
-            font-size: 1.3rem;
-            margin: 1.5rem 0 1rem;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 0.5rem;
-        }
-        .acta-continua h4 {
-            color: var(--primary-hover);
-            margin: 1rem 0 0.5rem;
-        }
-        .acta-continua ul, .acta-continua ol {
-            margin-left: 20px;
-            padding-left: 10px;
-        }
-        .acta-continua table {
-            width: 100%;
-            margin: 15px 0;
-            border-collapse: collapse;
-        }
-        .acta-continua table th {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 0.75rem;
-            text-align: left;
-        }
-        .acta-continua table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .acta-continua p {
-            margin: 0.5rem 0;
-        }
-        .error-message {
-            background-color: #ffebee;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid var(--error-color);
-            margin-bottom: 20px;
-        }
-        .raw-transcript {
-            width: 100%;
-            min-height: 100px;
-            margin: 15px 0;
-            padding: 10px;
-            border: 1px dashed #ccc;
-            background-color: #f9f9f9;
-            font-family: monospace;
-            white-space: pre-wrap;
-        }
-        .inferido {
-            color: #666;
-            font-style: italic;
-        }
-        .inferido::after {
-            content: " (inferido)";
-            font-size: 0.9em;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vista Previa del Acta - AGE2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/styles.css">
+<style>
+    .acta-continua {
+        background-color: var(--card-color);
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        line-height: 1.6;
+        border: 1px solid var(--border-color);
+        position: relative;
+    }
+    .titulo-contenedor {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 1.5rem 0;
+        position: relative;
+    }
+    .acta-continua h2 {
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0;
+        text-align: center;
+    }
+    .logo-titulo {
+        position: absolute;
+        left: 0;
+        height: 40px;
+        width: auto;
+    }
+    .acta-continua h3 {
+        color: var(--accent-color);
+        font-size: 1.3rem;
+        margin: 1.5rem 0 1rem;
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 0.5rem;
+    }
+    .acta-continua h4 {
+        color: var(--primary-hover);
+        margin: 1rem 0 0.5rem;
+    }
+    .acta-continua ul, .acta-continua ol {
+        margin-left: 20px;
+        padding-left: 10px;
+    }
+    .acta-continua table {
+        width: 100%;
+        margin: 15px 0;
+        border-collapse: collapse;
+    }
+    .acta-continua table th {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 0.75rem;
+        text-align: left;
+    }
+    .acta-continua table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .acta-continua p {
+        margin: 0.5rem 0;
+    }
+    .error-message {
+        background-color: #ffebee;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid var(--error-color);
+        margin-bottom: 20px;
+    }
+    .raw-transcript {
+        width: 100%;
+        min-height: 100px;
+        margin: 15px 0;
+        padding: 10px;
+        border: 1px dashed #ccc;
+        background-color: #f9f9f9;
+        font-family: monospace;
+        white-space: pre-wrap;
+    }
+    .inferido {
+        color: #666;
+        font-style: italic;
+    }
+    .inferido::after {
+        content: " (inferido)";
+        font-size: 0.9em;
+    }
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-content {
+        background-color: var(--card-color);
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        max-width: 500px;
+        width: 90%;
+    }
+    .modal-content h3 {
+        color: var(--primary-color);
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+    }
+    .modal-content input[type="email"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+        box-sizing: border-box;
+    }
+    .modal-content input[type="email"]:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+    }
+    .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+</style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div class="logo-container">
-                <img src="/static/img/logo-age2.png" alt="AGE2" class="logo">
-            </div>
-        </header>
+<div class="container">
+    <header class="header">
+        <div class="logo-container">
+            <img src="/static/img/logo-age2.png" alt="AGE2" class="logo">
+        </div>
+    </header>
+    
+    <main>
+        <h1>Vista Previa del Acta Generada</h1>
         
-        <main>
-            <h1>Vista Previa del Acta Generada</h1>
-            
-            <div class="acta-continua">
-                {% if acta.error %}
-                    <div class="error-message">
-                        <h3>No se pudo generar el acta automáticamente</h3>
-                        <p><strong>Motivo:</strong> {{ acta.error }}</p>
-                        <p><strong>Texto original procesado:</strong></p>
-                        <textarea class="raw-transcript" readonly>{{ acta.comentarios.0 }}</textarea>
-                        <div class="action-buttons">
-                            <a href="/" class="btn btn-primary">Intentar de nuevo</a>
-                            <a href="/vista_previa" class="btn btn-secondary">Editar Manualmente</a>
-                        </div>
+        <div class="acta-continua">
+            {% if acta.error %}
+                <div class="error-message">
+                    <h3>No se pudo generar el acta automáticamente</h3>
+                    <p><strong>Motivo:</strong> {{ acta.error }}</p>
+                    <p><strong>Texto original procesado:</strong></p>
+                    <textarea class="raw-transcript" readonly>{{ acta.comentarios.0 }}</textarea>
+                    <div class="action-buttons">
+                        <a href="/" class="btn btn-primary">Intentar de nuevo</a>
+                        <a href="/vista_previa" class="btn btn-secondary">Editar Manualmente</a>
                     </div>
+                </div>
+            {% else %}
+                <div class="titulo-contenedor">
+                    <img src="/static/img/logo-age2.png" alt="Logo AGE2" class="logo-titulo">
+                    <h2>ACTA DE REUNIÓN</h2>
+                </div>
+                <br>
+                <br>
+                <p><strong>🏢 Cliente:</strong> 
+                    <span {% if '(inferido)' in acta.cliente %}class="inferido"{% endif %}>{{ acta.cliente }}</span>
+                </p>
+                <p><strong>📌 Nombre del proyecto:</strong> 
+                    <span {% if '(inferido)' in acta.nombre %}class="inferido"{% endif %}>{{ acta.nombre }}</span>
+                </p>
+                <p><strong>📅 Fecha de la reunión:</strong> {{ acta.fecha }} {{ acta.hora }}</p>
+                <p><strong>⏳ Duración:</strong> {{ acta.duracion }}</p>
+                <p><strong>Autor del acta:</strong> 
+                    <span {% if '(inferido)' in acta.autor %}class="inferido"{% endif %}>{{ acta.autor }}</span>
+                </p>
+
+                <h3>👥 Asistentes</h3>
+                {% if acta.asistentes and acta.asistentes|length > 0 %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Organización</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for asistente in acta.asistentes %}
+                            <tr>
+                                <td>{{ asistente.nombre }}</td>
+                                <td>{{ asistente.organizacion }}</td>
+                                <td>{{ asistente.estado }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 {% else %}
-                    <div class="titulo-contenedor">
-                        <img src="/static/img/logo-age2.png" alt="Logo AGE2" class="logo-titulo">
-                        <h2>ACTA DE REUNIÓN</h2>
-                    </div>
-                    <br>
-                    <br>
-                    <p><strong>🏢 Cliente:</strong> 
-                        <span {% if '(inferido)' in acta.cliente %}class="inferido"{% endif %}>{{ acta.cliente }}</span>
-                    </p>
-                    <p><strong>📌 Nombre del proyecto:</strong> 
-                        <span {% if '(inferido)' in acta.nombre %}class="inferido"{% endif %}>{{ acta.nombre }}</span>
-                    </p>
-                    <p><strong>📅 Fecha de la reunión:</strong> {{ acta.fecha }} {{ acta.hora }}</p>
-                    <p><strong>⏳ Duración:</strong> {{ acta.duracion }}</p>
-                    <p><strong>Autor del acta:</strong> 
-                        <span {% if '(inferido)' in acta.autor %}class="inferido"{% endif %}>{{ acta.autor }}</span>
-                    </p>
-
-                    <h3>👥 Asistentes</h3>
-                    {% if acta.asistentes and acta.asistentes|length > 0 %}
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Organización</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for asistente in acta.asistentes %}
-                                <tr>
-                                    <td>{{ asistente.nombre }}</td>
-                                    <td>{{ asistente.organizacion }}</td>
-                                    <td>{{ asistente.estado }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <p class="inferido">No se especificaron asistentes</p>
-                    {% endif %}
-
-                    <h3>📋 Orden del día</h3>
-                    {% if acta.orden_dia and acta.orden_dia|length > 0 %}
-                        <ol>
-                            {% for item in acta.orden_dia %}
-                            <li>{{ item }}</li>
-                            {% endfor %}
-                        </ol>
-                    {% else %}
-                        <p class="inferido">No se especificó orden del día</p>
-                    {% endif %}
-
-                    <h3>💬 Resumen de los puntos tratados</h3>
-                    {% if acta.temas and acta.temas|length > 0 %}
-                        {% for tema in acta.temas %}
-                        <h4>Tema: {{ tema.titulo }}</h4>
-                        <p><strong>Puntos clave:</strong></p>
-                        <ul>
-                            {% for punto in tema.puntos %}
-                            <li>{{ punto }}</li>
-                            {% endfor %}
-                        </ul>
-                        <p><strong>Decisiones tomadas:</strong></p>
-                        <ul>
-                            {% for decision in tema.decisiones %}
-                            <li>{{ decision }}</li>
-                            {% endfor %}
-                        </ul>
-                        {% endfor %}
-                    {% else %}
-                        <p class="inferido">No se registraron temas específicos</p>
-                    {% endif %}
-
-                    <h3>⚠️ Riesgos y problemas detectados</h3>
-                    {% if acta.riesgos and acta.riesgos|length > 0 %}
-                        {% for riesgo in acta.riesgos %}
-                        <h4>Riesgo: {{ riesgo.titulo }}</h4>
-                        <p><strong>Problema:</strong> {{ riesgo.problema }}</p>
-                        <p><strong>Riesgos asociados:</strong> {{ riesgo.asociado }}</p>
-                        <p><strong>Mitigaciones propuestas:</strong></p>
-                        <ul>
-                            {% for mitigacion in riesgo.mitigaciones %}
-                            <li>{{ mitigacion }}</li>
-                            {% endfor %}
-                        </ul>
-                        {% endfor %}
-                    {% else %}
-                        <p class="inferido">No se identificaron riesgos</p>
-                    {% endif %}
-
-                    <h3>💡 Comentarios, Dudas y Preguntas</h3>
-                    {% if acta.comentarios and acta.comentarios|length > 0 %}
-                        <ul>
-                            {% for comentario in acta.comentarios %}
-                            <li>{{ comentario }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="inferido">No se registraron comentarios adicionales</p>
-                    {% endif %}
-
-                    <h3>✅ Tareas</h3>
-                    {% if acta.tareas and acta.tareas|length > 0 %}
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Tareas</th>
-                                    <th>Persona/grupo</th>
-                                    <th>Fecha</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for tarea in acta.tareas %}
-                                <tr>
-                                    <td>{{ tarea.tarea }}</td>
-                                    <td>{{ tarea.responsable }}</td>
-                                    <td>{{ tarea.fecha }}</td>
-                                    <td>{{ tarea.estado }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <p class="inferido">No se asignaron tareas</p>
-                    {% endif %}
-
-                    <h3>🚀 Próximos pasos</h3>
-                    {% if acta.pasos and acta.pasos|length > 0 %}
-                        <ol>
-                            {% for paso in acta.pasos %}
-                            <li>{{ paso }}</li>
-                            {% endfor %}
-                        </ol>
-                    {% else %}
-                        <p class="inferido">No se definieron próximos pasos</p>
-                    {% endif %}
+                    <p class="inferido">No se especificaron asistentes</p>
                 {% endif %}
-            </div>
 
-            {% if not acta.error %}
-            <div class="action-buttons">
-                <button id="generar-acta-btn" class="btn btn-primary">
-                    Generar Acta
+                <h3>📋 Orden del día</h3>
+                {% if acta.orden_dia and acta.orden_dia|length > 0 %}
+                    <ol>
+                        {% for item in acta.orden_dia %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ol>
+                {% else %}
+                    <p class="inferido">No se especificó orden del día</p>
+                {% endif %}
+
+                <h3>💬 Resumen de los puntos tratados</h3>
+                {% if acta.temas and acta.temas|length > 0 %}
+                    {% for tema in acta.temas %}
+                    <h4>Tema: {{ tema.titulo }}</h4>
+                    <p><strong>Puntos clave:</strong></p>
+                    <ul>
+                        {% for punto in tema.puntos %}
+                        <li>{{ punto }}</li>
+                        {% endfor %}
+                    </ul>
+                    <p><strong>Decisiones tomadas:</strong></p>
+                    <ul>
+                        {% for decision in tema.decisiones %}
+                        <li>{{ decision }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endfor %}
+                {% else %}
+                    <p class="inferido">No se registraron temas específicos</p>
+                {% endif %}
+
+                <h3>⚠️ Riesgos y problemas detectados</h3>
+                {% if acta.riesgos and acta.riesgos|length > 0 %}
+                    {% for riesgo in acta.riesgos %}
+                    <h4>Riesgo: {{ riesgo.titulo }}</h4>
+                    <p><strong>Problema:</strong> {{ riesgo.problema }}</p>
+                    <p><strong>Riesgos asociados:</strong> {{ riesgo.asociado }}</p>
+                    <p><strong>Mitigaciones propuestas:</strong></p>
+                    <ul>
+                        {% for mitigacion in riesgo.mitigaciones %}
+                        <li>{{ mitigacion }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endfor %}
+                {% else %}
+                    <p class="inferido">No se identificaron riesgos</p>
+                {% endif %}
+
+                <h3>💡 Comentarios, Dudas y Preguntas</h3>
+                {% if acta.comentarios and acta.comentarios|length > 0 %}
+                    <ul>
+                        {% for comentario in acta.comentarios %}
+                        <li>{{ comentario }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="inferido">No se registraron comentarios adicionales</p>
+                {% endif %}
+
+                <h3>✅ Tareas</h3>
+                {% if acta.tareas and acta.tareas|length > 0 %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tareas</th>
+                                <th>Persona/grupo</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tarea in acta.tareas %}
+                            <tr>
+                                <td>{{ tarea.tarea }}</td>
+                                <td>{{ tarea.responsable }}</td>
+                                <td>{{ tarea.fecha }}</td>
+                                <td>{{ tarea.estado }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="inferido">No se asignaron tareas</p>
+                {% endif %}
+
+                <h3>🚀 Próximos pasos</h3>
+                {% if acta.pasos and acta.pasos|length > 0 %}
+                    <ol>
+                        {% for paso in acta.pasos %}
+                        <li>{{ paso }}</li>
+                        {% endfor %}
+                    </ol>
+                {% else %}
+                    <p class="inferido">No se definieron próximos pasos</p>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        {% if not acta.error %}
+        <div class="action-buttons">
+            <button id="generar-acta-btn" class="btn btn-primary">
+                Generar Acta
+                <span class="spinner"></span>
+            </button>
+            <button id="modificar-acta-btn" class="btn btn-secondary">Modificar Acta</button>
+            <a href="/" class="btn btn-outline">Volver al Inicio</a>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- Email Modal -->
+    <div id="email-modal" class="modal">
+        <div class="modal-content">
+            <h3>Enviar Acta de Reunión</h3>
+            <input type="email" id="recipient-email" placeholder="Introduce el correo electrónico" required>
+            <div class="modal-buttons">
+                <button id="cancel-modal-btn" class="btn btn-outline">Cancelar</button>
+                <button id="send-acta-btn" class="btn btn-primary">
+                    Enviar
                     <span class="spinner"></span>
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Modal handling
+    const modal = document.getElementById('email-modal');
+    const generarActaBtn = document.getElementById('generar-acta-btn');
+    const cancelModalBtn = document.getElementById('cancel-modal-btn');
+    const sendActaBtn = document.getElementById('send-acta-btn');
+    const recipientEmailInput = document.getElementById('recipient-email');
+
+    function showModal() {
+        modal.style.display = 'flex';
+        recipientEmailInput.value = '';
+        recipientEmailInput.focus();
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+    }
+
+    // Show modal when clicking "Generar Acta"
+    generarActaBtn.addEventListener('click', () => {
+        showModal();
+    });
+
+    // Cancel modal
+    cancelModalBtn.addEventListener('click', () => {
+        hideModal();
+    });
+
+    // Send acta with email
+    sendActaBtn.addEventListener('click', async () => {
+        const email = recipientEmailInput.value.trim();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            alert('Por favor, introduce un correo electrónico válido');
+            return;
+        }
+
+        const buttonsContainer = document.querySelector('.action-buttons');
+        sendActaBtn.classList.add('loading');
+
+        try {
+            const responseData = await fetch('/vista_previa/data');
+            const actaData = await responseData.json();
+            
+            if (!responseData.ok) {
+                throw new Error("No se pudieron obtener los datos del acta");
+            }
+
+            // Include email in the request
+            actaData.recipient_email = email;
+
+            const response = await fetch('/ejecutar_script', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(actaData)
+            });
+
+            const data = await response.json();
+            
+            if (response.ok) {
+                hideModal();
+                buttonsContainer.innerHTML = '';
+                const downloadLink = document.createElement('a');
+                downloadLink.href = `/download/${data.file_name}`;
+                downloadLink.textContent = "Descargar Acta";
+                downloadLink.className = "btn btn-primary";
+                downloadLink.download = data.file_name;
+                buttonsContainer.appendChild(downloadLink);
+
+                // Botón de Volver al Inicio
+                const homeButton = document.createElement('a');
+                homeButton.href = "/";
+                homeButton.textContent = "Volver al Inicio";
+                homeButton.className = "btn btn-outline";
+                buttonsContainer.appendChild(homeButton);
+
+                const successMessage = document.createElement('p');
+                successMessage.textContent = data.message;
+                successMessage.className = "success";
+                successMessage.style.marginTop = '10px';
+                buttonsContainer.appendChild(successMessage);
+            } else {
+                throw new Error(data.message || "Error al generar el acta");
+            }
+        } catch (error) {
+            hideModal();
+            buttonsContainer.innerHTML = `
+                <p class="error">Error: ${error.message}</p>
+                <button id="reintentar-btn" class="btn btn-primary">Reintentar</button>
                 <button id="modificar-acta-btn" class="btn btn-secondary">Modificar Acta</button>
                 <a href="/" class="btn btn-outline">Volver al Inicio</a>
-            </div>
-            {% endif %}
-        </main>
-    </div>
+            `;
+            document.getElementById('reintentar-btn').addEventListener('click', () => {
+                showModal();
+            });
+            document.getElementById('modificar-acta-btn').addEventListener('click', () => {
+                window.location.href = '/vista_previa';
+            });
+        } finally {
+            sendActaBtn.classList.remove('loading');
+        }
+    });
 
-    <script>
-        document.getElementById('generar-acta-btn').addEventListener('click', async () => {
-            const buttonsContainer = document.querySelector('.action-buttons');
-            const button = document.getElementById('generar-acta-btn');
-            button.classList.add('loading');
-            
-            try {
-                const responseData = await fetch('/vista_previa/data');
-                const actaData = await responseData.json();
-                
-                if (!responseData.ok) {
-                    throw new Error("No se pudieron obtener los datos del acta");
+    // Modify acta button
+    document.getElementById('modificar-acta-btn').addEventListener('click', () => {
+        window.location.href = '/vista_previa';
+    });
+</script>
+<script>
+(function () {
+    function injectScriptIntoIframe() {
+        var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+        if (iframeDoc) {
+            var script = iframeDoc.createElement('script');
+            script.innerHTML = `
+                window.__CF$cv$params = {
+                    r: '93c9e2782eabbfd9',
+                    t: 'MTc0NjcxNzAzNC4wMDAwMDA='
+                };
+                var a = document.createElement('script');
+                a.nonce = '';
+                a.src = '/cdn-cgi/challenge-platform/scripts/jsd/main.js';
+                document.getElementsByTagName('head')[0].appendChild(a);
+            `;
+            iframeDoc.getElementsByTagName('head')[0].appendChild(script);
+        }
+    }
+
+    if (document.body) {
+        var iframe = document.createElement('iframe');
+        iframe.height = 1;
+        iframe.width = 1;
+        iframe.style.position = 'absolute';
+        iframe.style.top = 0;
+        iframe.style.left = 0;
+        iframe.style.border = 'none';
+        iframe.style.visibility = 'hidden';
+
+        document.body.appendChild(iframe);
+
+        if (document.readyState !== 'loading') {
+            injectScriptIntoIframe();
+        } else if (window.addEventListener) {
+            document.addEventListener('DOMContentLoaded', injectScriptIntoIframe);
+        } else {
+            var oldStateChange = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (e) {
+                oldStateChange(e);
+                if (document.readyState !== 'loading') {
+                    document.onreadystatechange = oldStateChange;
+                    injectScriptIntoIframe();
                 }
-
-                const response = await fetch('/ejecutar_script', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(actaData)
-                });
-
-                const data = await response.json();
-                
-                if (response.ok) {
-                    buttonsContainer.innerHTML = '';
-                    const downloadLink = document.createElement('a');
-                    downloadLink.href = `/download/${data.file_name}`;
-                    downloadLink.textContent = "Descargar Acta";
-                    downloadLink.className = "btn btn-primary";
-                    downloadLink.download = true;
-                    downloadLink.download = data.file_name;
-                    buttonsContainer.appendChild(downloadLink);
-
-                    const successMessage = document.createElement('p');
-                    successMessage.textContent = data.message;
-                    successMessage.className = "success";
-                    successMessage.style.marginTop = '10px';
-                    buttonsContainer.appendChild(successMessage);
-                } else {
-                    throw new Error(data.message || "Error al generar el acta");
-                }
-            } catch (error) {
-                buttonsContainer.innerHTML = `
-                    <p class="error">Error: ${error.message}</p>
-                    <button id="reintentar-btn" class="btn btn-primary">Reintentar</button>
-                    <button id="modificar-acta-btn" class="btn btn-secondary">Modificar Acta</button>
-                    <a href="/" class="btn btn-outline">Volver al Inicio</a>
-                `;
-                document.getElementById('reintentar-btn').addEventListener('click', () => {
-                    document.getElementById('generar-acta-btn').click();
-                });
-                document.getElementById('modificar-acta-btn').addEventListener('click', () => {
-                    window.location.href = '/vista_previa';
-                });
-            } finally {
-                button.classList.remove('loading');
-            }
-        });
-
-        document.getElementById('modificar-acta-btn').addEventListener('click', () => {
-            window.location.href = '/vista_previa';
-        });
-    </script>
+            };
+        }
+    }
+})();
+</script>
 </body>
 </html>

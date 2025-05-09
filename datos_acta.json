@@ -6,58 +6,43 @@
             "organizacion": "Jefe de España"
         },
         {
-            "estado": "Presente",
+            "estado": "Ausente",
             "nombre": "Raúl",
             "organizacion": "Jefe de España"
         }
     ],
     "autor": "",
     "cliente": "Jefe de España",
-    "comentarios": [
-        "El sistema Mob funciona correctamente, pero Jawa no.",
-        "Es necesario verificar la conexión a Internet."
-    ],
+    "comentarios": [],
     "duracion": "",
     "fecha": "",
     "hora": "",
-    "nombre": "Sistema de Boletas",
-    "orden_dia": [
-        "Problemas con el sistema de boletas",
-        "Fallo de conexión a Internet",
-        "Solución de problemas técnicos"
-    ],
+    "nombre": "",
+    "orden_dia": [],
     "pasos": [
-        "Raúl llamará a Abdul para verificar el problema del sistema."
+        "Raúl llamará a Abdul en 5 minutos"
     ],
-    "riesgos": [
-        {
-            "asociado": "Sistema de Boletas",
-            "mitigaciones": [
-                "Raúl contactará a Abdul para resolver el problema técnico."
-            ],
-            "problema": "El sistema no puede procesar boletas debido a fallos de Internet.",
-            "titulo": "Fallo en el sistema de boletas"
-        }
-    ],
+    "riesgos": [],
     "tareas": [
         {
             "estado": "Pendiente",
             "fecha": "",
             "responsable": "Raúl",
-            "tarea": "Contactar a Abdul para solucionar problemas técnicos"
+            "tarea": "Resolver el problema de conexión de Jawa"
         }
     ],
     "temas": [
         {
             "decisiones": [
-                "Raúl llamará a Abdul en 5 minutos para solucionar el problema."
+                "Raúl llamará a Abdul para solucionar el problema"
             ],
             "puntos": [
-                "El sistema de boletas no funciona correctamente.",
-                "El robot no tiene conexión a Internet.",
-                "El módulo Jawa no está operativo."
+                "Jawa no funciona",
+                "Problemas con el robot",
+                "Mob funciona correctamente"
             ],
-            "titulo": "Problemas técnicos"
+            "titulo": "Problemas con el sistema de boletas"
         }
-    ]
+    ],
+    "recipient_email": "jose.lopezvigueras@gmail.com"
 }
